@@ -1,31 +1,9 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-
-let notes = [
-  {
-    id: 1,
-    content: "HTML is easy",
-    date: "2019-05-30T17:30:31.098Z",
-    important: true,
-  },
-  {
-    id: 2,
-    content: "Browser can execute only Javascript",
-    date: "2019-05-30T18:39:34.091Z",
-    important: false,
-  },
-  {
-    id: 3,
-    content: "GET and POST are the most important methods of HTTP protocol",
-    date: "2019-05-30T19:20:14.298Z",
-    important: true,
-  },
-];
-
-const generateId = () => {
-  const maxId = notes.length > 0 ? Math.max(...notes.map((n) => n.id)) : 0;
-  return maxId + 1;
-};
+const errorHandler = require("./errorHandler");
+const mongoose = require("mongoose");
+const Note = require("./models/note");
 
 const app = express();
 
@@ -34,13 +12,22 @@ app.use(express.json());
 app.use(express.static("build"));
 
 app.get("/notes", (req, res) => {
-  res.status(200).json(notes);
+  Note.find({}).then((result) => {
+    res.status(200).json(result);
+  });
 });
 
-app.get("/notes/:id", (req, res) => {
-  const id = parseInt(req.params.id);
-  const note = notes.find((note) => note.id === id);
-  note ? res.status(200).json(note) : res.status(404).end();
+app.get("/notes/:id", (req, res, next) => {
+  const id = req.params.id;
+  Note.findById(id)
+    .then((note) => {
+      if (note) {
+        res.status(200).json(note);
+      } else {
+        res.status(404).end();
+      }
+    })
+    .catch((error) => next(error));
 });
 
 app.post("/notes", (req, res) => {
@@ -54,23 +41,50 @@ app.post("/notes", (req, res) => {
     });
   }
 
-  const note = {
+  const note = new Note({
     content: body.content,
     important: body.important || false,
     date: new Date(),
-    id: generateId(),
+  });
+
+  note.save().then((result) => {
+    res.status(201).json(result);
+  });
+});
+
+app.delete("/notes/:id", (req, res, next) => {
+  const id = parseInt(req.params.id);
+  Note.findByIdAndDelete(id)
+    .then((result) => {
+      res.status(204).end();
+    })
+    .catch((err) => next(err));
+});
+
+app.put("/notes/:id", (req, res, next) => {
+  const body = req.body;
+
+  console.log("updating", body);
+
+  const note = {
+    content: body.content,
+    important: body.important,
   };
 
-  notes = notes.concat(note);
-
-  res.status(201).json(note);
+  Note.findByIdAndUpdate(req.params.id, note, { new: true })
+    .then((updatedNote) => {
+      res.json(updatedNote);
+    })
+    .catch((error) => next(error));
 });
 
-app.delete("/notes/:id", (req, res) => {
-  const id = parseInt(req.params.id);
-  notes = notes.filter((note) => note.id !== id);
-  res.status(204).end();
-});
+const unknownEndpoint = (req, res) => {
+  res.status(404).send({ error: "unknown endpoint" });
+};
+
+app.use(unknownEndpoint);
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
