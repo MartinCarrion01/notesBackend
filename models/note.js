@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const url = process.env.URL;
+const url = process.env.MONGOURL;
 
 console.log("connecting to", url);
 
@@ -14,8 +14,15 @@ mongoose
   });
 
 const noteSchema = new mongoose.Schema({
-  content: String,
-  date: Date,
+  content: {
+    type: String,
+    minlength: 5,
+    required: true,
+  },
+  date: {
+    type: Date,
+    required: true,
+  },
   important: Boolean,
 });
 

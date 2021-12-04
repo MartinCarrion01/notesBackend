@@ -30,7 +30,7 @@ app.get("/notes/:id", (req, res, next) => {
     .catch((error) => next(error));
 });
 
-app.post("/notes", (req, res) => {
+app.post("/notes", (req, res, next) => {
   const body = req.body;
 
   console.log("request received");
@@ -47,9 +47,12 @@ app.post("/notes", (req, res) => {
     date: new Date(),
   });
 
-  note.save().then((result) => {
-    res.status(201).json(result);
-  });
+  note
+    .save()
+    .then((result) => {
+      res.status(201).json(result);
+    })
+    .catch((error) => next(error));
 });
 
 app.delete("/notes/:id", (req, res, next) => {
