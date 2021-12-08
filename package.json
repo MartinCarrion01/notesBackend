@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --verbose",
     "start": "node index.js",
     "dev": "nodemon index.js",
     "build:ui": "rm -rf build && cd ../fsopen/fsopen/part2/part2 && npm run build --prod && cp -r build ../../../../notesBackend",
@@ -20,5 +20,11 @@
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "mongoose": "^6.0.14"
+  },
+  "devDependencies": {
+    "jest": "^27.4.3"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }
