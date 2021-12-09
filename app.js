@@ -1,5 +1,6 @@
 const config = require("./utils/config");
 const express = require("express");
+require('express-async-errors')
 const cors = require("cors");
 const notesRouter = require("./controllers/notes");
 const middleware = require("./utils/middleware");
@@ -8,10 +9,13 @@ const mongoose = require("mongoose");
 
 const app = express();
 
-logger.info("connecting to", config.URL);
+const url =
+  process.env.NODE_ENV === "test" ? config.MONGOURLTEST : config.MONGOURL;
+
+logger.info("connecting to", url);
 
 mongoose
-  .connect(config.URL)
+  .connect(url)
   .then(() => {
     logger.info("connected to MongoDB");
   })

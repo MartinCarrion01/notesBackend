@@ -1,9 +1,11 @@
 require("dotenv").config();
 
 const PORT = process.env.PORT;
-const URL = process.env.URL;
+const MONGOURL = process.env.MONGOURL;
+const MONGOURLTEST = process.env.MONGOURLTEST;
 
 module.exports = {
-  URL,
+  MONGOURL,
+  MONGOURLTEST,
   PORT,
 };

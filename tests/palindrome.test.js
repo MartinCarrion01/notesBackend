@@ -9,7 +9,7 @@ test("palindrome of a", () => {
 test("palindrome of react", () => {
   const result = palindrome("react");
 
-  expect(result).toBe("tkaer");
+  expect(result).toBe("tcaer");
 });
 
 test("palindrome of releveler", () => {
