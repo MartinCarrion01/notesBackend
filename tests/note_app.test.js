@@ -105,6 +105,20 @@ test("a note can be updated", async () => {
   expect(resultNote.body).toEqual(processedNoteToView);
 });
 
+test("fails with statuscode 404 if note does not exist", async () => {
+  const validNonexistingId = await helper.nonExistingId();
+
+  console.log(validNonexistingId);
+
+  await api.get(`/notes/${validNonexistingId}`).expect(404);
+});
+
+test("fails with statuscode 400 id is invalid", async () => {
+  const invalidId = "5a3d5da59070081a82a3445";
+
+  await api.get(`/notes/${invalidId}`).expect(400);
+});
+
 test("a note can be deleted", async () => {
   const notesAtStart = await helper.notesInDb();
   const noteToDelete = notesAtStart[0];
